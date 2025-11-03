@@ -68,4 +68,4 @@ O objetivo principal deste projeto foi construir um jogo de plataforma completo 
 
 * Pausar: ESC
 
-**Divirta-se!**
+**Logo, mais atualizações...**
