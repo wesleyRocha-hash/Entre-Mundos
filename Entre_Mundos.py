@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 import math
 import json
-import asyncio # <--- ADICIONADO PARA PYGBAG
+import asyncio 
 
 # ----------------- Constantes de Configuração -----------------
 WIDTH, HEIGHT = 1700, 1000
@@ -25,7 +25,7 @@ DASH_TIME = 150 # ms
 SHOCKWAVE_RADIUS = 150
 SHOCKWAVE_FORCE = 18
 MAGNET_RADIUS = 200
-INVINCIBILITY_TIME = 1000 # 1 segundo
+INVINCIBILITY_TIME = 1000 
 ENEMY_DAMAGE = 25
 SPIKE_DAMAGE = 40
 BOSS_STOMP_DAMAGE = 20
@@ -41,10 +41,10 @@ GRAY = (100, 100, 100); DARKGRAY = (50, 50, 50); YELLOW = (255, 255, 0); ORANGE 
 OFF_WHITE = (220, 220, 220)
 
 # --- Cor do Personagem ---
-PLAYER_BODY_COLOR = (0, 150, 255)  # Tronco Azul
-PLAYER_LEG_COLOR = (150, 111, 214) # Pernas Roxas
-PLAYER_HEAD_COLOR = (255, 255, 100) # Visor Amarelo
-PLAYER_ARM_COLOR = (230, 230, 230) # Braços Brancos (para atirar)
+PLAYER_BODY_COLOR = (0, 150, 255)  
+PLAYER_LEG_COLOR = (150, 111, 214) 
+PLAYER_HEAD_COLOR = (255, 255, 100)
+PLAYER_ARM_COLOR = (230, 230, 230)
 
 PLAYER_ACCENT_COLOR = (0, 150, 255)
 PARTICLE_DUST_COLOR = (130, 100, 100)
@@ -80,7 +80,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.w, self.h = 40, 60 # Novo tamanho
+        self.w, self.h = 40, 60 
         
         self.pos = pygame.math.Vector2(WIDTH // 4, HEIGHT - 100)
         self.vel = pygame.math.Vector2(0, 0)
@@ -115,13 +115,13 @@ class Player(pygame.sprite.Sprite):
         }
         self.can_double_jump = False
         
-        self.walk_frame = 0.0 # Adicionado para animação de caminhada
+        self.walk_frame = 0.0 
         self.last_update = pygame.time.get_ticks()
         
         self.image = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
         self.rect = self.image.get_rect(center=self.pos)
         
-        # Hitbox ajustada para o novo tamanho
+       
         self.hitbox = pygame.Rect(0, 0, 24, 50)
         self.hitbox.center = self.rect.center
 
@@ -129,12 +129,12 @@ class Player(pygame.sprite.Sprite):
         """Novo método de desenho - Quadrangular, fluido, braços ao atirar."""
         self.image.fill((0, 0, 0, 0))
         now = pygame.time.get_ticks()
-        status = self.get_status() # idle, walk, jump, ground_pound
+        status = self.get_status()
         
-        self.walk_frame += 0.25 # Controla a velocidade da animação de caminhada
+        self.walk_frame += 0.25
         
         # --- Posições Base ---
-        bob = math.sin(now * 0.005) * 2 # Balanço suave
+        bob = math.sin(now * 0.005) * 2 
         body_w = 20
         body_h = 22
         body_x = (self.w - body_w) // 2
@@ -143,8 +143,7 @@ class Player(pygame.sprite.Sprite):
         head_w = 16
         head_h = 16
         head_x = (self.w - head_w) // 2
-        head_y = body_y - head_h + 5 # Sobrepõe um pouco
-        
+        head_y = body_y - head_h + 5
         leg_w = 8
         leg_h = 20
         hip_y = body_y + body_h - 5
@@ -154,25 +153,21 @@ class Player(pygame.sprite.Sprite):
 
         # --- Lógica das Pernas ---
         if status == 'walk':
-            # Movimento de tesoura para frente e para trás
             anim_cycle = math.sin(self.walk_frame)
             
-            # Perna 1 (L)
             leg_l_x = leg_l_x_base + (anim_cycle * 6) # Movimento X
             leg_l_y = leg_y_base - (anim_cycle * 4 if anim_cycle > 0 else 0) # Perna "da frente" sobe
 
-            # Perna 2 (R)
             leg_r_x = leg_r_x_base - (anim_cycle * 6) # Movimento X
             leg_r_y = leg_y_base - (-anim_cycle * 4 if anim_cycle < 0 else 0) # Perna "da frente" sobe
 
         elif status == 'jump' or status == 'ground_pound':
-            # Pernas juntas e ligeiramente para trás
             leg_l_x = leg_l_x_base + 2
             leg_r_x = leg_r_x_base - 2
-            leg_l_y = leg_y_base - 5 # Puxadas para cima
+            leg_l_y = leg_y_base - 5
             leg_r_y = leg_y_base - 5
         
-        elif status == 'dash': # --- POSE DO SUPERMAN ---
+        elif status == 'dash':
             body_y = 25
             head_y = 25
             leg_l_x = leg_l_x_base - 10
@@ -189,45 +184,38 @@ class Player(pygame.sprite.Sprite):
         # --- Desenhar ---
         
         if status == 'dash':
-            # Desenha corpo e cabeça na horizontal
             pygame.draw.rect(self.image, PLAYER_BODY_COLOR, (body_x - 10, body_y, body_h, body_w), border_radius=3) # Corpo deitado
             pygame.draw.rect(self.image, PLAYER_HEAD_COLOR, (body_x + body_h - 10, head_y, head_h, head_w), border_radius=3) # Cabeça na frente
-            # Pernas retas para trás
             pygame.draw.rect(self.image, PLAYER_LEG_COLOR, (leg_l_x, leg_l_y - 3, leg_h, leg_w), border_radius=2)
             pygame.draw.rect(self.image, PLAYER_LEG_COLOR, (leg_r_x, leg_r_y + 3, leg_h, leg_w), border_radius=2)
-            # Braço do Superman
             pygame.draw.line(self.image, PLAYER_ARM_COLOR, (body_x + body_h - 5, body_y + 10), (body_x + body_h + 10, body_y + 10), 6)
 
         else:
-            # Desenho Padrão (Vertical)
             pygame.draw.rect(self.image, PLAYER_LEG_COLOR, (leg_l_x, leg_l_y, leg_w, leg_h), border_radius=2)
             pygame.draw.rect(self.image, PLAYER_LEG_COLOR, (leg_r_x, leg_r_y, leg_w, leg_h), border_radius=2)
             pygame.draw.rect(self.image, PLAYER_BODY_COLOR, (body_x, body_y, body_w, body_h), border_radius=3) 
             pygame.draw.rect(self.image, PLAYER_HEAD_COLOR, (head_x, head_y, head_w, head_h), border_radius=3)
 
-        # --- Lógica dos Braços (só ao atirar, e não no dash) ---
         if self.is_shooting and status != 'dash':
             arm_length = 15
-            arm_width = 6 # "menor que as pernas"
+            arm_width = 6
             
             mouse_pos = pygame.mouse.get_pos()
             dx = mouse_pos[0] - (self.rect.centerx)
             dy = mouse_pos[1] - (self.rect.centery - 5) 
             aim_angle_rad = math.atan2(dy, dx)
             
-            arm_start_pos = (self.w // 2, body_y + 5) # Ombro
+            arm_start_pos = (self.w // 2, body_y + 5) 
             arm_end_pos = (arm_start_pos[0] + math.cos(aim_angle_rad) * arm_length,
                            arm_start_pos[1] + math.sin(aim_angle_rad) * arm_length)
                            
             pygame.draw.line(self.image, PLAYER_ARM_COLOR, arm_start_pos, arm_end_pos, arm_width) # Braço
-            
-            # Arma
+
             gun_start = arm_end_pos
             gun_end = (gun_start[0] + math.cos(aim_angle_rad) * 8,
                        gun_start[1] + math.sin(aim_angle_rad) * 8)
             pygame.draw.line(self.image, DARKGRAY, gun_start, gun_end, arm_width)
 
-        # --- Flip e Invencibilidade ---
         if self.direction == 'left':
             self.image = pygame.transform.flip(self.image, True, False)
         
@@ -258,16 +246,15 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         mouse_pos = pygame.mouse.get_pos()
         is_strong = self.powerups['tiro_forte']
-        
-        # Posição de tiro ajustada para o novo sprite
-        shot_origin = pygame.math.Vector2(self.rect.centerx, self.rect.centery - 5) # Posição do "ombro"
+
+        shot_origin = pygame.math.Vector2(self.rect.centerx, self.rect.centery - 5) 
         
         p = Projectile(self.game, shot_origin, mouse_pos, strong=is_strong)
         self.game.all_sprites.add(p)
         self.game.projectiles.add(p)
         
         self.is_shooting = True
-        self.shoot_timer = pygame.time.get_ticks() + 200 # Mostra braço por 200ms
+        self.shoot_timer = pygame.time.get_ticks() + 200 
     
     def attack(self):
         pass
@@ -301,7 +288,7 @@ class Player(pygame.sprite.Sprite):
     def knockback(self, enemy):
         self.vel.y = -5; self.vel.x = -8 if enemy.rect.centerx > self.rect.centerx else 8
 
-    def update(self, keys, player): # Player argument is unused here but kept for compatibility with group update
+    def update(self, keys, player): 
         now = pygame.time.get_ticks()
         was_on_ground = self.on_ground
 
@@ -347,8 +334,7 @@ class Player(pygame.sprite.Sprite):
         self.check_vertical_collisions()
 
         self.rect.center = self.pos
-        self.hitbox.center = self.rect.center # Sincroniza hitbox com o rect principal
-
+        self.hitbox.center = self.rect.center
         if self.on_ground and not was_on_ground:
             if self.is_ground_pounding:
                 self.is_ground_pounding = False
@@ -374,7 +360,7 @@ class Player(pygame.sprite.Sprite):
         
         self.coyote_timer = self.last_on_ground_time + COYOTE_TIME
         
-        self._update_sprite_image() # Usa o novo método de desenho
+        self._update_sprite_image() 
         if self.pos.y > HEIGHT + self.h: self.game.player_death()
 
     def check_horizontal_collisions(self):
@@ -385,7 +371,7 @@ class Player(pygame.sprite.Sprite):
             elif self.vel.x < 0:
                 self.hitbox.left = plat.rect.right
             self.pos.x = self.hitbox.centerx
-            self.rect.centerx = self.pos.x # Sincroniza rect
+            self.rect.centerx = self.pos.x
 
     def check_vertical_collisions(self):
         self.on_ground = False
@@ -403,10 +389,9 @@ class Player(pygame.sprite.Sprite):
                 self.hitbox.top = plat.rect.bottom
                 self.vel.y = 0
             self.pos.y = self.hitbox.centery
-            self.rect.centery = self.pos.y # Sincroniza rect
+            self.rect.centery = self.pos.y 
         
     def get_status(self):
-        # CORREÇÃO: Remove 'shoot' da lógica de status de movimento
         if self.is_ground_pounding: return 'ground_pound'
         if self.is_dashing: return 'dash'
         if not self.on_ground: return 'jump'
@@ -489,13 +474,12 @@ class Enemy(pygame.sprite.Sprite):
 
     def draw_self(self):
         """Desenha o inimigo com um visual temático e braços animados."""
-        
-        # Define cores com base no self.theme
+
         colors = {
             'forest': {'body': VINE_COLOR, 'arm': (20, 100, 20), 'eye': BLACK},
-            'cave': {'body': (160, 160, 220), 'arm': PURPLE_CRYSTAL, 'eye': WHITE}, # Golem de cristal
-            'volcano': {'body': DARKGRAY, 'arm': (100, 100, 100), 'eye': ORANGE}, # Golem de pedra
-            'electric': {'body': (90, 90, 130), 'arm': ELECTRIC_BLUE, 'eye': ELECTRIC_YELLOW} # Golem de metal
+            'cave': {'body': (160, 160, 220), 'arm': PURPLE_CRYSTAL, 'eye': WHITE},
+            'volcano': {'body': DARKGRAY, 'arm': (100, 100, 100), 'eye': ORANGE}, 
+            'electric': {'body': (90, 90, 130), 'arm': ELECTRIC_BLUE, 'eye': ELECTRIC_YELLOW} 
         }
         theme_colors = colors.get(self.theme, colors['forest'])
         body_color = theme_colors['body']
@@ -519,12 +503,12 @@ class Enemy(pygame.sprite.Sprite):
         rotated_arm_front = pygame.transform.rotate(arm_front_surf, -arm_angle)
         arm_front_rect = rotated_arm_front.get_rect(center=(self.w - 12, 35 + body_bob))
 
-        if self.dir == 1: # Olhando para a direita
+        if self.dir == 1: 
             self.image.blit(rotated_arm_back, arm_back_rect)
             pygame.draw.ellipse(self.image, body_color, body_rect, 0)
             pygame.draw.circle(self.image, eye_color, (self.w - 20, 30 + body_bob), 4)
             self.image.blit(rotated_arm_front, arm_front_rect)
-        else: # Olhando para a esquerda (flip)
+        else: 
             self.image.blit(rotated_arm_front, arm_front_rect) 
             pygame.draw.ellipse(self.image, body_color, body_rect, 0)
             pygame.draw.circle(self.image, eye_color, (20, 30 + body_bob), 4)
@@ -544,7 +528,6 @@ class Enemy(pygame.sprite.Sprite):
                 trail = FireTrail(self.game, self.rect.midbottom)
                 self.game.all_sprites.add(trail); self.game.hazards.add(trail)
             elif self.theme == 'electric':
-                # Emite uma pequena onda de choque elétrica
                 discharge = ElectricDischarge(self.game, self.rect.center, ELECTRIC_BLUE, radius=60, damage=10)
                 self.game.all_sprites.add(discharge); self.game.hazards.add(discharge)
 
@@ -762,13 +745,11 @@ class MiniStormDragon(pygame.sprite.Sprite):
         dist_to_player = self.pos.distance_to(player.pos)
         
         if self.state == 'waiting':
-            # Atira no jogador se estiver no alcance
             if dist_to_player < 300 and now - self.last_shot > self.shot_cooldown:
                 self.last_shot = now
                 proj = Projectile(self.game, self.rect.center, player.rect.center, speed=8, projectile_type='electricball')
                 self.game.all_sprites.add(proj); self.game.enemies.add(proj)
 
-            # Decide mergulhar
             if dist_to_player < 250 and now - self.last_swoop > self.swoop_cooldown:
                 self.state = 'swooping'
                 if (player.pos - self.pos).length() > 0:
@@ -788,7 +769,7 @@ class MiniStormDragon(pygame.sprite.Sprite):
         
         self.pos += self.vel
         self.rect.center = self.pos
-        self.draw_self() # Re-desenha para animar asas
+        self.draw_self()
 
 class Particle(pygame.sprite.Sprite):
     def __init__(self, pos, color, particle_type='default'):
@@ -842,8 +823,7 @@ class Door(pygame.sprite.Sprite):
     def __init__(self, game, midbottom_pos, next_theme_name):
         super().__init__()
         self.game = game
-        
-        # --- Define Font and Text first ---
+
         try:
             font = pygame.font.Font(self.game.font_path, 18)
         except (pygame.error, FileNotFoundError, TypeError):
@@ -852,13 +832,11 @@ class Door(pygame.sprite.Sprite):
         text_surf = font.render("Avançar!", True, WHITE)
         text_rect = text_surf.get_rect()
 
-        # --- Define dimensions based on text and portal ---
-        self.w_portal = 60 # Portal width
-        self.h_portal = 90 # Portal height
-        self.h_text = 40 # Space for text
-        
-        # Calculate final width: must be at least as wide as the text or the portal
-        self.w_total = max(self.w_portal, text_rect.width + 20) # Add 20px padding for text
+        self.w_portal = 60 
+        self.h_portal = 90 
+        self.h_text = 40 
+
+        self.w_total = max(self.w_portal, text_rect.width + 20) 
         self.h_total = self.h_portal + self.h_text
         
         self.image = pygame.Surface((self.w_total, self.h_total), pygame.SRCALPHA)
@@ -869,18 +847,14 @@ class Door(pygame.sprite.Sprite):
         self.last_particle = pygame.time.get_ticks()
         self.particle_cooldown = 100
 
-        # --- Draw elements centered on the new surface width ---
-        
-        # Portal (centered horizontally)
+
         portal_x = (self.w_total - self.w_portal) // 2
         portal_rect = pygame.Rect(portal_x, self.h_text, self.w_portal, self.h_portal)
         pygame.draw.ellipse(self.image, BLACK, portal_rect)
-        
-        # Texto (centered horizontally)
+
         text_rect.center = (self.w_total // 2, self.h_text // 2)
         self.image.blit(text_surf, text_rect)
-        
-        # Salva a largura do portal para as partículas
+  
         self.portal_center_x_rel = portal_rect.centerx
 
 
@@ -937,7 +911,7 @@ class Projectile(pygame.sprite.Sprite):
         try:
             direction = (pygame.math.Vector2(target_pos) - self.pos).normalize()
         except ValueError:
-            direction = pygame.math.Vector2(1, 0) # Padrão se o vetor for zero
+            direction = pygame.math.Vector2(1, 0) 
             
         self.vel = direction * speed
         
@@ -949,21 +923,18 @@ class Projectile(pygame.sprite.Sprite):
     def update(self, keys, player):
         self.pos += self.vel
         self.rect.center = self.pos
-        
-        # A explosão agora é acionada pelo projétil
+
         collided_enemy = pygame.sprite.spritecollideany(self, self.game.enemies)
         collided_platform = pygame.sprite.spritecollideany(self, self.game.platforms)
 
-        # Projéteis de jogador não devem colidir com o jogador
         if collided_enemy == self.game.player:
             collided_enemy = None
-            
-        # Projéteis de inimigos (que não são balas) não devem colidir com outros inimigos
+
         if self in self.game.projectiles:
-            pass # É um projétil de jogador, pode colidir com inimigo
+            pass
         else:
             if collided_enemy:
-                collided_enemy = None # É projétil de inimigo, ignora colisão com inimigo
+                collided_enemy = None 
 
         if self.projectile_type in ('fireball', 'electricball') and (collided_enemy or collided_platform):
             color = ORANGE if self.projectile_type == 'fireball' else ELECTRIC_BLUE
@@ -1020,7 +991,7 @@ class Boss(pygame.sprite.Sprite):
         self.max_health = 100 + 50 * (self.game.level // 4)
         self.health = self.max_health
         self.body_parts = {}
-        self.name = "CHEFE" # Nome padrão
+        self.name = "CHEFE" 
 
     def take_damage(self, amount):
         self.health -= amount
@@ -1255,7 +1226,7 @@ class StormDragon(Boss):
     def __init__(self, game):
         super().__init__(game)
         self.name = "Dragão da Tempestade"
-        self.max_health *= 1.5 # Mais vida
+        self.max_health *= 1.5
         self.health = self.max_health
         self.w, self.h = 250, 200
         self.image = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
@@ -1266,9 +1237,9 @@ class StormDragon(Boss):
         self.attack_cooldown = 2500
         self.fury_mode = False
         self.fury_timer = 0
-        self.fury_duration = 5000 # 5 segundos de fúria
+        self.fury_duration = 5000 
         self.last_fury = pygame.time.get_ticks()
-        self.fury_cooldown = 15000 # Fúria a cada 15 segundos
+        self.fury_cooldown = 15000 
         self.direction = 1
         self.hover_center_y = HEIGHT / 3
         self._draw_base_sprite()
@@ -1291,14 +1262,12 @@ class StormDragon(Boss):
         self.image.blit(self.base_image, (0,0))
         now = pygame.time.get_ticks()
         wing_angle = math.sin(now * 0.003) * 30
-        
-        # Asa Esquerda (Primária)
+
         wing_left_surf = pygame.Surface((100, 120), pygame.SRCALPHA)
         pygame.draw.polygon(wing_left_surf, DRAGON_STORM_WING_PRIMARY, [(0,100), (100,0), (100,120)])
         rotated_wing_left = pygame.transform.rotate(wing_left_surf, wing_angle + 20)
         self.image.blit(rotated_wing_left, (30, -20))
 
-        # Asa Direita (Secundária)
         wing_right_surf = pygame.Surface((100, 120), pygame.SRCALPHA)
         pygame.draw.polygon(wing_right_surf, DRAGON_STORM_WING_SECONDARY, [(0,0), (100,100), (0,120)])
         rotated_wing_right = pygame.transform.rotate(wing_right_surf, -wing_angle - 20)
@@ -1706,37 +1675,33 @@ class Game:
         self.ally_projectiles = pygame.sprite.Group() 
         self.hazards = pygame.sprite.Group() 
         self.all_sprites.add(self.player); self.setup_level(self.level)
-        # self.run_game() # Removido para o loop async
 
     def run(self):
-        # Esta função é para rodar localmente
         asyncio.run(self.run_async())
 
 
     async def run_async(self):
-        # Loop principal assíncrono para pygbag
         self.running = True
         while self.running:
             if self.state == 'playing':
-                # O loop de jogo principal agora acontece aqui
                 self.events_game()
                 self.update_game()
                 self.draw_game()
                 self.clock.tick(FPS)
             elif self.state == 'menu':
-                self.run_menu() # Este loop síncrono interno irá rodar
+                self.run_menu()
                 if self.state == 'playing':
-                    self.new_game() # CORREÇÃO: Chamar new_game() QUANDO o menu sair para 'playing'
+                    self.new_game()
             elif self.state == 'game_over':
                 self.run_game_over()
-            elif self.state == 'win': # --- NOVO ESTADO DE VITÓRIA ---
+            elif self.state == 'win':
                 self.run_win_screen()
             elif self.state == 'ranking':
                 self.run_ranking()
             elif self.state == 'quit':
                 self.running = False
             
-            await asyncio.sleep(0) # Permite que o navegador respire
+            await asyncio.sleep(0) 
         pygame.quit()
 
 
@@ -1779,7 +1744,6 @@ class Game:
             pygame.display.flip(); self.clock.tick(FPS)
 
     def run_game(self):
-        # Esta função é agora apenas um placeholder, o loop está em run_async
         pass
 
     def run_game_over(self):
@@ -1803,7 +1767,7 @@ class Game:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN: 
                     self.state = 'menu'; return
             self.screen.fill(BLACK); 
-            self.draw_win_screen(); # Nova função de desenho
+            self.draw_win_screen();
             pygame.display.flip(); self.clock.tick(FPS)
 
     def run_ranking(self):
@@ -1845,14 +1809,13 @@ class Game:
                         self.state = 'menu'; self.paused = False
                 elif self.hud_pause_button_rect.collidepoint(event.pos): self.paused = True
                 else:
-                    self.player.shoot() # Jogador sempre atira
+                    self.player.shoot()
 
     def update_game(self):
         if self.paused: return
         keys = pygame.key.get_pressed()
         self.all_sprites.update(keys, self.player)
 
-        # Lógica de montaria removida
 
         self.background_sprites.update(keys, self.player)
         if self.get_theme_name() == 'volcano' and random.random() < 0.02 and not self.boss:
@@ -1881,7 +1844,6 @@ class Game:
         self.draw_text(f"Level: {self.level}", 16, OFF_WHITE, 10, 95, align="topleft")
         
         hud_y = 125
-        # CORREÇÃO: Iterar sobre self.player.powerups, não self.powerups
         for name, is_active in self.player.powerups.items():
             if is_active:
                 self.draw_text(name.replace('_', ' ').title(), 16, OFF_WHITE, 10, hud_y, align="topleft")
@@ -1890,9 +1852,7 @@ class Game:
         if self.boss and self.boss.alive():
             bar_w = 400; bar_h = 25
             bar_pct = self.boss.health / self.boss.max_health
-            # Desenha o nome do chefe
             self.draw_text(self.boss.name, 22, WHITE, WIDTH/2, 20)
-            # Desenha a barra de vida abaixo do nome
             pygame.draw.rect(self.screen, RED, (WIDTH/2 - bar_w/2, 50, bar_w * bar_pct, bar_h))
             pygame.draw.rect(self.screen, OFF_WHITE, (WIDTH/2 - bar_w/2, 50, bar_w, bar_h), 2)
 
@@ -1988,7 +1948,6 @@ class Game:
         return {'forest': THEME_FOREST, 'cave': THEME_CAVE, 'volcano': THEME_VOLCANO, 'electric': THEME_ELECTRIC}[self.get_theme_name()]
 
     def _setup_level_common(self):
-        # Lógica de dragão removida
         for grp_name in ['platforms', 'enemies', 'coins', 'doors', 'spikes', 'powerups', 'particles', 'projectiles', 'hazards', 'ally_projectiles']:
             if hasattr(self, grp_name):
                 grp = getattr(self, grp_name)
@@ -2040,18 +1999,18 @@ class Game:
                 spawn_type = random.random()
                 
                 if theme_name == 'electric':
-                    if spawn_type < 0.15: # 15% chance for MiniStormDragon
+                    if spawn_type < 0.15:
                         self.enemies.add(MiniStormDragon(self, (random.randint(int(plat.rect.left), int(plat.rect.right)), plat.rect.y - 100), theme_name))
-                    elif spawn_type < 0.30: # 15% chance for FlyingEnemy
+                    elif spawn_type < 0.30:
                         self.enemies.add(FlyingEnemy(self, plat.rect.centerx, plat.rect.y - 60, theme_name))
-                    else: # 70% chance for ground Enemy
+                    else:
                         self.enemies.add(Enemy(self, plat.rect.centerx, plat.rect.y, plat, theme_name, random.random() < chase_chance, enemy_speed))
-                else: # Lógica original para outros biomas
-                    if spawn_type < 0.15: # 15% chance for FlyingEnemy
+                else:
+                    if spawn_type < 0.15:
                         self.enemies.add(FlyingEnemy(self, plat.rect.centerx, plat.rect.y - 60, theme_name))
-                    elif spawn_type < 0.35: # 20% chance for ExplodingEnemy
+                    elif spawn_type < 0.35: 
                         self.enemies.add(ExplodingEnemy(self, (random.randint(int(plat.rect.left), int(plat.rect.right)), -50), theme_name))
-                    else: # 65% chance for ground Enemy
+                    else:
                         self.enemies.add(Enemy(self, plat.rect.centerx, plat.rect.y, plat, theme_name, random.random() < chase_chance, enemy_speed))
 
             if random.random() < 0.2 + level * 0.05 and not spawned_item: self.spikes.add(Spike(plat.rect.centerx, plat.rect.y, theme_name))
@@ -2090,11 +2049,10 @@ class Game:
         print(f"🎉 Você derrotou o chefe do nível {self.level}!")
 
         # --- LÓGICA DE FINAL DO JOGO ---
-        if self.level == 16: # Se for o último chefe
+        if self.level == 16:
             self.final_score = self.player.score
-            self.state = 'win' # Manda para a tela de vitória
+            self.state = 'win'
         else:
-            # Se não for o final, spawna o portal
             next_level_num = self.level + 1
             next_theme_name = self.get_theme_name_by_level(next_level_num)
             door_pos = (WIDTH - 100, HEIGHT - 40)
@@ -2227,6 +2185,5 @@ async def main():
     await game.run_async()
 
 if __name__ == "__main__":
-    # Esta é a parte que o Pygbag usa
     asyncio.run(main())
 
