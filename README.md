@@ -67,3 +67,5 @@ O objetivo principal deste projeto foi construir um jogo de plataforma completo 
 * Atirar: Clique do Mouse
 
 * Pausar: ESC
+
+**Divirta-se!**
