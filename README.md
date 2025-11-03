@@ -1,7 +1,7 @@
 # Entre Mundos
 
 
-Um jogo 2D de plataforma e tiro (shoot 'em up) com biomas gerados proceduralmente e batalhas épicas contra chefões, desenvolvido em Python com Pygame.
+Um jogo 2D de plataforma e tiro com biomas gerados proceduralmente e batalhas épicas contra chefões, desenvolvido em Python com Pygame.
 
 
 # 🚀 Sobre o Projeto
