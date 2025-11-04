@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 import math
 import json
-import asyncio # <--- ADICIONADO PARA PYGBAG
+import asyncio
 
 # ----------------- Constantes de Configuração -----------------
 WIDTH, HEIGHT = 1700, 1000
@@ -41,10 +41,10 @@ GRAY = (100, 100, 100); DARKGRAY = (50, 50, 50); YELLOW = (255, 255, 0); ORANGE 
 OFF_WHITE = (220, 220, 220)
 
 # --- Cor do Personagem ---
-PLAYER_BODY_COLOR = (0, 150, 255)  # Tronco Azul
-PLAYER_LEG_COLOR = (150, 111, 214) # Pernas Roxas
-PLAYER_HEAD_COLOR = (255, 255, 100) # Visor Amarelo
-PLAYER_ARM_COLOR = (230, 230, 230) # Braços Brancos (para atirar)
+PLAYER_BODY_COLOR = (0, 150, 255)  
+PLAYER_LEG_COLOR = (150, 111, 214) 
+PLAYER_HEAD_COLOR = (255, 255, 100) 
+PLAYER_ARM_COLOR = (230, 230, 230) 
 
 PLAYER_ACCENT_COLOR = (0, 150, 255)
 PARTICLE_DUST_COLOR = (130, 100, 100)
@@ -80,7 +80,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.w, self.h = 40, 60 # Novo tamanho
+        self.w, self.h = 40, 60 
         
         self.pos = pygame.math.Vector2(WIDTH // 4, HEIGHT - 100)
         self.vel = pygame.math.Vector2(0, 0)
